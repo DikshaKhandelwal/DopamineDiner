@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dopamine Diner</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="dd-container">
+    <!-- Header -->
+    <header class="dd-header">
+      <div class="dd-logo">
+        <div class="dd-chef-hat">👨‍🍳</div>
+        <h1>Dopamine Diner</h1>
+      </div>
+      <div class="dd-kitchen-level">
+        <span class="dd-level-badge">Level <span id="kitchen-level">1</span></span>
+      </div>
+    </header>
+
+    <!-- Today's Dish -->
+    <section class="dd-dish-section">
+      <h2>Today's Digital Dish</h2>
+      <div class="dd-dish-container" id="dish-container">
+        <div class="dd-dish-image">
+          <div class="dd-dish-icon">🍳</div>
+        </div>
+        <div class="dd-dish-info">
+          <h3 id="dish-name">Preparing your dish...</h3>
+          <p id="dish-description">Cook by browsing to see what you create!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Ingredients Breakdown -->
+    <section class="dd-ingredients-section">
+      <h3>Today's Ingredients</h3>
+      <div class="dd-ingredients-grid" id="ingredients-grid">
+        <!-- Ingredients will be dynamically added -->
+      </div>
+    </section>
+
+    <!-- Stats Dashboard -->
+    <section class="dd-stats-section">
+      <div class="dd-stats-grid">
+        <div class="dd-stat-card">
+          <div class="dd-stat-icon">📏</div>
+          <div class="dd-stat-info">
+            <span class="dd-stat-value" id="total-scroll">0</span>
+            <span class="dd-stat-label">Scroll Distance (px)</span>
+          </div>
+        </div>
+        <div class="dd-stat-card">
+          <div class="dd-stat-icon">⏱️</div>
+          <div class="dd-stat-info">
+            <span class="dd-stat-value" id="session-time">0</span>
+            <span class="dd-stat-label">Session Time (min)</span>
+          </div>
+        </div>
+        <div class="dd-stat-card">
+          <div class="dd-stat-icon">🔥</div>
+          <div class="dd-stat-info">
+            <span class="dd-stat-value" id="burn-alerts">0</span>
+            <span class="dd-stat-label">Burn Alerts</span>
+          </div>
+        </div>
+        <div class="dd-stat-card">
+          <div class="dd-stat-icon">🏆</div>
+          <div class="dd-stat-info">
+            <span class="dd-stat-value" id="mindful-sessions">0</span>
+            <span class="dd-stat-label">Mindful Sessions</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Kitchen Upgrades -->
+    <section class="dd-upgrades-section">
+      <h3>Kitchen Upgrades</h3>
+      <div class="dd-upgrades-grid" id="upgrades-grid">
+        <!-- Upgrades will be dynamically added -->
+      </div>
+    </section>
+
+    <!-- Education -->
+    <section class="dd-education-section">
+      <button class="dd-learn-btn" id="learn-ingredients">
+        📖 Learn Your Ingredients
+      </button>
+    </section>
+
+    <!-- Footer Actions -->
+    <footer class="dd-footer">
+      <button class="dd-reset-btn" id="reset-day">Reset Today</button>
+      <button class="dd-settings-btn" id="settings">⚙️</button>
+    </footer>
+  </div>
+
+  <!-- Education Modal -->
+  <div class="dd-modal-overlay" id="education-modal">
+    <div class="dd-modal">
+      <div class="dd-modal-header">
+        <h3>Understanding Your Digital Ingredients</h3>
+        <button class="dd-close-btn" id="close-education">×</button>
+      </div>
+      <div class="dd-modal-body">
+        <div class="dd-ingredient-guide">
+          <div class="dd-guide-item">
+            <span class="dd-guide-icon">🛢️</span>
+            <div class="dd-guide-content">
+              <h4>Grease (Doomscrolling)</h4>
+              <p>Endless scrolling creates "grease" in your digital diet. Too much makes everything feel heavy and unsatisfying.</p>
+            </div>
+          </div>
+          <div class="dd-guide-item">
+            <span class="dd-guide-icon">🍭</span>
+            <div class="dd-guide-content">
+              <h4>Sugar (Short-form Content)</h4>
+              <p>Quick dopamine hits from reels and shorts. Sweet in small doses, but too much causes crashes.</p>
+            </div>
+          </div>
+          <div class="dd-guide-item">
+            <span class="dd-guide-icon">🧂</span>
+            <div class="dd-guide-content">
+              <h4>Salt (Tab Switching)</h4>
+              <p>Rapid context switching adds "salt" - enhances focus in moderation, overwhelming when overdone.</p>
+            </div>
+          </div>
+          <div class="dd-guide-item">
+            <span class="dd-guide-icon">🥬</span>
+            <div class="dd-guide-content">
+              <h4>Greens (Focused Reading)</h4>
+              <p>Deep, focused content consumption. The healthy foundation of a balanced digital diet.</p>
+            </div>
+          </div>
+          <div class="dd-guide-item">
+            <span class="dd-guide-icon">💧</span>
+            <div class="dd-guide-content">
+              <h4>Water (Mindful Breaks)</h4>
+              <p>Conscious pauses and reflections. Essential for processing and digesting your digital experiences.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

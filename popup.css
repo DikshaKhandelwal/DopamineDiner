@@ -1,0 +1,723 @@
+/* Dopamine Diner Popup Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  width: 400px;
+  height: 600px;
+  background: linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%);
+  overflow-x: hidden;
+}
+
+.dd-container {
+  padding: 16px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+/* Header Styles */
+.dd-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid rgba(249, 115, 22, 0.2);
+}
+
+.dd-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dd-chef-hat {
+  font-size: 24px;
+  animation: dd-chef-bounce 2s ease-in-out infinite;
+}
+
+@keyframes dd-chef-bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-4px); }
+  60% { transform: translateY(-2px); }
+}
+
+.dd-logo h1 {
+  font-size: 20px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.dd-level-badge {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Dish Section */
+.dd-dish-section {
+  margin-bottom: 24px;
+}
+
+.dd-dish-section h2 {
+  font-size: 18px;
+  color: #92400e;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.dd-dish-container {
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.dd-dish-image {
+  margin-bottom: 12px;
+}
+
+.dd-dish-icon {
+  font-size: 48px;
+  animation: dd-dish-rotate 3s ease-in-out infinite;
+}
+
+@keyframes dd-dish-rotate {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-5deg); }
+  75% { transform: rotate(5deg); }
+}
+
+.dd-dish-info h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #92400e;
+  margin-bottom: 4px;
+}
+
+.dd-dish-info p {
+  font-size: 14px;
+  color: #a16207;
+  line-height: 1.4;
+}
+
+/* Ingredients Section */
+.dd-ingredients-section {
+  margin-bottom: 24px;
+}
+
+.dd-ingredients-section h3 {
+  font-size: 16px;
+  color: #92400e;
+  margin-bottom: 12px;
+}
+
+.dd-ingredients-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.dd-ingredient-item {
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 12px;
+  padding: 12px;
+  text-align: center;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  position: relative;
+}
+
+.dd-ingredient-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.dd-ingredient-icon {
+  font-size: 24px;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.dd-ingredient-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #92400e;
+  margin-bottom: 2px;
+}
+
+.dd-ingredient-amount {
+  font-size: 10px;
+  color: #a16207;
+}
+
+/* Tooltip */
+.dd-ingredient-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1f2937;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.dd-ingredient-item:hover .dd-ingredient-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(-4px);
+}
+
+/* Stats Section */
+.dd-stats-section {
+  margin-bottom: 24px;
+}
+
+.dd-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.dd-stat-card {
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dd-stat-icon {
+  font-size: 20px;
+}
+
+.dd-stat-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.dd-stat-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: #92400e;
+}
+
+.dd-stat-label {
+  font-size: 10px;
+  color: #a16207;
+  line-height: 1.2;
+}
+
+/* Upgrades Section */
+.dd-upgrades-section {
+  margin-bottom: 24px;
+}
+
+.dd-upgrades-section h3 {
+  font-size: 16px;
+  color: #92400e;
+  margin-bottom: 12px;
+}
+
+.dd-upgrades-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.dd-upgrade-item {
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 12px;
+  padding: 12px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.dd-upgrade-item.unlocked {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  transform: scale(1.05);
+}
+
+.dd-upgrade-item.locked {
+  opacity: 0.5;
+  filter: grayscale(1);
+}
+
+.dd-upgrade-icon {
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+
+.dd-upgrade-name {
+  font-size: 10px;
+  font-weight: 600;
+}
+
+/* Education Section */
+.dd-education-section {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.dd-learn-btn {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.dd-learn-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+/* Footer */
+.dd-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 16px;
+  border-top: 1px solid rgba(249, 115, 22, 0.2);
+}
+
+.dd-reset-btn {
+  background: transparent;
+  border: 2px solid #f97316;
+  color: #f97316;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dd-reset-btn:hover {
+  background: #f97316;
+  color: white;
+}
+
+.dd-settings-btn {
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.dd-settings-btn:hover {
+  background: rgba(249, 115, 22, 0.1);
+}
+
+/* Modal Styles */
+.dd-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.dd-modal-overlay.active {
+  display: flex;
+}
+
+.dd-modal {
+  background: white;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 480px;
+  max-height: 80%;
+  overflow-y: auto;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.dd-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.dd-modal-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.dd-close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #6b7280;
+  padding: 4px;
+  line-height: 1;
+}
+
+.dd-modal-body {
+  padding: 20px;
+}
+
+.dd-ingredient-guide {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.dd-guide-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 12px;
+}
+
+.dd-guide-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.dd-guide-content h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 4px;
+}
+
+.dd-guide-content p {
+  font-size: 14px;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+/* Daily Challenge Section */
+.dd-daily-challenge-section {
+  margin: 16px 0 12px 0;
+  text-align: center;
+}
+
+.dd-daily-challenge-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(90deg, #fbbf24 0%, #f59e42 100%);
+  color: #1f2937;
+  border-radius: 12px;
+  padding: 8px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 2px 8px #fbbf2433;
+}
+
+.dd-challenge-icon {
+  font-size: 20px;
+}
+
+.dd-challenge-label {
+  font-weight: 700;
+  margin-right: 4px;
+}
+
+.dd-challenge-status {
+  margin-left: 8px;
+  font-size: 16px;
+  color: #059669;
+}
+
+/* Scrollbar Styling */
+.dd-container::-webkit-scrollbar {
+  width: 4px;
+}
+
+.dd-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dd-container::-webkit-scrollbar-thumb {
+  background: rgba(249, 115, 22, 0.3);
+  border-radius: 2px;
+}
+
+.dd-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(249, 115, 22, 0.5);
+}
+
+/* Settings Modal Styles */
+.dd-settings-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.8);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.dd-settings-modal-overlay.active {
+  display: flex;
+}
+
+.dd-settings-modal-overlay .dd-modal {
+  background: white;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 480px;
+  max-height: 80%;
+  overflow-y: auto;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.dd-settings-group {
+  margin-bottom: 18px;
+  text-align: left;
+}
+
+.dd-settings-group label {
+  font-weight: 600;
+  color: #92400e;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.dd-settings-group select,
+.dd-settings-group input[type="range"],
+.dd-settings-group input[type="number"] {
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1.5px solid #fed7aa;
+  font-size: 1rem;
+  margin-bottom: 2px;
+}
+
+.dd-settings-save-btn {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 8px;
+  width: 100%;
+  transition: background 0.2s;
+}
+
+.dd-settings-save-btn:hover {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+}
+
+/* Nature Video Modal */
+.dd-nature-video-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  background: rgba(18, 24, 38, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+.dd-nature-video-frame {
+  width: 90vw;
+  max-width: 700px;
+  height: 50vw;
+  max-height: 400px;
+  background: #111;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px 0 rgba(0,0,0,0.37);
+  margin-bottom: 24px;
+}
+.dd-nature-video-modal .dd-nature-video-close {
+  position: absolute;
+  top: 24px;
+  right: 32px;
+  font-size: 2rem;
+  background: rgba(0,0,0,0.3);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  z-index: 10;
+  display: none;
+  transition: background 0.2s;
+}
+.dd-nature-video-modal .dd-nature-video-close.active {
+  display: block;
+}
+.dd-nature-video-modal .dd-nature-video-close:hover {
+  background: rgba(0,0,0,0.6);
+}
+
+/* Flower Breath Modal */
+.dd-flower-breath-modal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 16px;
+  background: #fff7ed;
+  border-radius: 20px;
+  max-width: 340px;
+  margin: auto;
+  box-shadow: 0 8px 32px 0 rgba(0,0,0,0.18);
+}
+.dd-flower-svg {
+  margin-bottom: 18px;
+  transition: transform 2s cubic-bezier(.4,0,.2,1);
+}
+.dd-flower-breath-inhale {
+  animation: dd-flower-inhale 2s forwards;
+}
+.dd-flower-breath-exhale {
+  animation: dd-flower-exhale 2s forwards;
+}
+@keyframes dd-flower-inhale {
+  from { transform: scale(1);}
+  to { transform: scale(1.25);}
+}
+@keyframes dd-flower-exhale {
+  from { transform: scale(1.25);}
+  to { transform: scale(0.85);}
+}
+.dd-flower-breath-instruction {
+  font-size: 1.1rem;
+  color: #92400e;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+.dd-flower-breath-counter {
+  font-size: 1rem;
+  color: #059669;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+.dd-flower-breath-modal .dd-close-btn {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 8px;
+  display: none;
+}
+
+/* Quote Carousel Modal */
+.dd-quote-carousel-modal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 16px;
+  background: #fff7ed;
+  border-radius: 20px;
+  max-width: 340px;
+  margin: auto;
+  box-shadow: 0 8px 32px 0 rgba(0,0,0,0.18);
+}
+.dd-quote-slide {
+  text-align: center;
+  margin-bottom: 18px;
+}
+.dd-quote-illustration {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+.dd-quote-text {
+  font-size: 1.2rem;
+  color: #92400e;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+.dd-quote-author {
+  font-size: 1rem;
+  color: #a16207;
+  margin-bottom: 8px;
+}
+.dd-quote-carousel-controls {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+.dd-quote-carousel-btn {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e42 100%);
+  color: #222;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.dd-quote-carousel-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.dd-quote-carousel-modal .dd-close-btn {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 8px;
+  display: none;
+}
+
+/* Overlay for modals */
+.dd-modal-overlay.active {
+  display: flex !important;
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  background: rgba(18, 24, 38, 0.85);
+  align-items: center;
+  justify-content: center;
+}

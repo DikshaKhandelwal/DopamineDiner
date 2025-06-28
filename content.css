@@ -1,0 +1,554 @@
+/* Dopamine Diner Content Styles */
+.dopamine-diner-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 999999;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.dd-modal-backdrop {
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+}
+
+.dd-modal-content {
+  background: linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%);
+  border-radius: 24px;
+  padding: 32px;
+  max-width: 520px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+  text-align: center;
+  animation: dd-modal-enter 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border: 2px solid rgba(249, 115, 22, 0.2);
+}
+
+@keyframes dd-modal-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.dd-burn-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  animation: dd-burn-pulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes dd-burn-pulse {
+  from { transform: scale(1); }
+  to { transform: scale(1.1); }
+}
+
+.dd-modal-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #dc2626;
+  margin-bottom: 12px;
+}
+
+.dd-modal-message {
+  font-size: 16px;
+  color: #92400e;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.dd-mindful-task {
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.dd-breathing-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  margin: 0 auto 16px;
+  transition: transform 2s ease-in-out;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+}
+
+.dd-breathing-circle.dd-inhale {
+  transform: scale(1.3);
+  box-shadow: 0 0 30px rgba(16, 185, 129, 0.5);
+}
+
+.dd-breathing-circle.dd-exhale {
+  transform: scale(0.8);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+}
+
+.dd-breath-counter {
+  font-size: 14px;
+  font-weight: 600;
+  color: #065f46;
+  margin-top: 12px;
+}
+
+.dd-task-breathing.dd-completed .dd-breathing-circle {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
+}
+
+.dd-reflection {
+  text-align: left;
+  margin-bottom: 24px;
+}
+
+.dd-reflection label {
+  display: block;
+  font-weight: 600;
+  color: #92400e;
+  margin-bottom: 8px;
+}
+
+.dd-reflection textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 12px;
+  border: 2px solid #fed7aa;
+  border-radius: 8px;
+  font-size: 14px;
+  resize: vertical;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.dd-reflection textarea:focus {
+  outline: none;
+  border-color: #f97316;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+}
+
+.dd-modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.dd-modal-actions button {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dd-btn-continue {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  color: white;
+}
+
+.dd-btn-continue:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(249, 115, 22, 0.3);
+}
+
+.dd-btn-break {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+}
+
+.dd-btn-break:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(16, 185, 129, 0.3);
+}
+
+/* Dopamine Diner Modal Styles */
+.dopamine-diner-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(18, 24, 38, 0.75);
+  backdrop-filter: blur(8px);
+}
+
+.dopamine-diner-modal .dd-modal-backdrop {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dopamine-diner-modal .dd-modal-content {
+  background: rgba(30, 41, 59, 0.95);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px 0 rgba(0,0,0,0.37);
+  padding: 32px 24px;
+  max-width: 400px;
+  width: 90vw;
+  color: #fff;
+  text-align: center;
+  position: relative;
+  animation: dd-modal-fadein 0.3s cubic-bezier(.4,0,.2,1);
+}
+
+@keyframes dd-modal-fadein {
+  from { opacity: 0; transform: scale(0.96);}
+  to { opacity: 1; transform: scale(1);}
+}
+
+.dopamine-diner-modal .dd-burn-icon {
+  font-size: 56px;
+  margin-bottom: 12px;
+  animation: dd-burn-pulse 1.2s infinite alternate;
+}
+
+@keyframes dd-burn-pulse {
+  from { filter: drop-shadow(0 0 0 #f87171);}
+  to { filter: drop-shadow(0 0 16px #f87171);}
+}
+
+.dopamine-diner-modal .dd-modal-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #fbbf24;
+}
+
+.dopamine-diner-modal .dd-modal-message {
+  font-size: 1rem;
+  color: #f3f4f6;
+  margin-bottom: 18px;
+}
+
+.dopamine-diner-modal .dd-mindful-task {
+  background: rgba(255,255,255,0.07);
+  border-radius: 14px;
+  padding: 18px 10px 14px 10px;
+  margin-bottom: 18px;
+  position: relative;
+}
+
+.dopamine-diner-modal .dd-breathing-circle {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  margin: 0 auto 10px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  box-shadow: 0 0 18px #05966955;
+  transition: transform 2s cubic-bezier(.4,0,.2,1), box-shadow 2s;
+}
+
+.dopamine-diner-modal .dd-breathing-circle.dd-inhale {
+  transform: scale(1.25);
+  box-shadow: 0 0 32px #10b98199;
+}
+
+.dopamine-diner-modal .dd-breathing-circle.dd-exhale {
+  transform: scale(0.85);
+  box-shadow: 0 0 8px #05966944;
+}
+
+.dopamine-diner-modal .dd-breath-counter {
+  font-size: 1rem;
+  color: #a7f3d0;
+  font-weight: 600;
+  margin-top: 8px;
+}
+
+.dopamine-diner-modal .dd-task-breathing.dd-completed .dd-breathing-circle {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e42 100%);
+  box-shadow: 0 0 24px #fbbf2499;
+}
+
+.dopamine-diner-modal .dd-task-breathing.dd-completed .dd-checkmark {
+  display: block;
+}
+
+.dopamine-diner-modal .dd-checkmark {
+  display: none;
+  margin: 12px auto 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #10b981;
+  position: relative;
+  animation: dd-checkmark-pop 0.5s cubic-bezier(.4,0,.2,1);
+}
+.dopamine-diner-modal .dd-checkmark:after {
+  content: '';
+  position: absolute;
+  left: 10px; top: 16px;
+  width: 10px; height: 18px;
+  border: solid #fff;
+  border-width: 0 4px 4px 0;
+  border-radius: 2px;
+  transform: rotate(45deg);
+  animation: dd-checkmark-draw 0.4s 0.1s cubic-bezier(.4,0,.2,1) forwards;
+  opacity: 0;
+}
+@keyframes dd-checkmark-pop {
+  from { transform: scale(0.7);}
+  to { transform: scale(1);}
+}
+@keyframes dd-checkmark-draw {
+  from { height: 0; opacity: 0;}
+  to { height: 18px; opacity: 1;}
+}
+
+/* Reflection styles */
+.dopamine-diner-modal .dd-reflection {
+  text-align: left;
+  margin-bottom: 16px;
+}
+.dopamine-diner-modal .dd-reflection label {
+  font-weight: 600;
+  color: #fbbf24;
+  margin-bottom: 4px;
+  display: block;
+}
+.dopamine-diner-modal .dd-reflection textarea {
+  width: 100%;
+  min-height: 60px;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1.5px solid #fbbf24;
+  background: rgba(255,255,255,0.10);
+  color: #fff;
+  font-size: 1rem;
+  margin-bottom: 4px;
+  resize: vertical;
+}
+.dopamine-diner-modal .dd-reflection textarea:focus {
+  outline: 2px solid #10b981;
+  border-color: #10b981;
+}
+
+/* Modal actions */
+.dopamine-diner-modal .dd-modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 10px;
+}
+.dopamine-diner-modal .dd-modal-actions button {
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e42 100%);
+  color: #222;
+  transition: background 0.2s;
+}
+.dopamine-diner-modal .dd-modal-actions .dd-btn-break {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #fff;
+}
+.dopamine-diner-modal .dd-modal-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Icon Match Game */
+.dopamine-diner-modal .dd-icon-match-game {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.dopamine-diner-modal .dd-icon-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.dopamine-diner-modal .dd-icon-btn {
+  font-size: 2rem;
+  background: rgba(255,255,255,0.08);
+  border: 2px solid transparent;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: border 0.2s;
+}
+.dopamine-diner-modal .dd-icon-btn.selected {
+  border: 2px solid #10b981;
+  background: rgba(16,185,129,0.15);
+}
+.dopamine-diner-modal .dd-icon-btn.matched {
+  border: 2px solid #fbbf24;
+  background: rgba(251,191,36,0.15);
+  pointer-events: none;
+}
+.dopamine-diner-modal .dd-icon-match-success {
+  font-size: 1.5rem;
+  color: #10b981;
+  margin-top: 8px;
+  font-weight: 700;
+  animation: dd-checkmark-pop 0.5s cubic-bezier(.4,0,.2,1);
+}
+
+/* Nature GIF Task */
+.dopamine-diner-modal .dd-nature-gif-task {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.dopamine-diner-modal .dd-nature-gif-img {
+  width: 220px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px #0004;
+  margin-bottom: 8px;
+}
+.dopamine-diner-modal .dd-nature-timer {
+  font-size: 1.1rem;
+  color: #fbbf24;
+  font-weight: 600;
+}
+.dopamine-diner-modal .dd-nature-skip-btn {
+  margin-top: 8px;
+  padding: 8px 18px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  font-size: 1rem;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #fff;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+.dopamine-diner-modal .dd-nature-skip-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.dopamine-diner-modal .dd-nature-skip-btn.unlocked {
+  opacity: 1;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e42 100%);
+  color: #222;
+}
+
+/* Fullscreen Break Modal Fallback Style */
+#dd-fullscreen-break-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  background: #111 url('https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif') center center/cover no-repeat;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+#dd-fullscreen-break-modal button {
+  margin-top: 24px;
+  padding: 12px 32px;
+  font-size: 1.2rem;
+  border-radius: 8px;
+  border: none;
+  background: #10b981;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  display: none;
+}
+#dd-fullscreen-break-modal button.active {
+  display: block;
+}
+/* MoodSwap Styles */
+.dd-moodswap-wrapper {
+  position: relative;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-radius: 12px;
+  padding: 16px;
+  margin: 8px 0;
+  border-left: 4px solid #f59e0b;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);
+  transition: all 0.3s ease;
+}
+
+.dd-moodswap-wrapper:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.dd-moodswap-content {
+  font-size: inherit;
+  line-height: 1.5;
+  color: #92400e;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.dd-moodswap-toggle {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(249, 115, 22, 0.9);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
+}
+
+.dd-moodswap-toggle:hover {
+  background: rgba(249, 115, 22, 1);
+  transform: scale(1.05);
+}
+
+.dd-moodswap-global-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 12px 20px;
+  font-weight: 700;
+  cursor: pointer;
+  z-index: 2147483647;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.dd-moodswap-global-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+.dd-moodswap-status {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  z-index: 2147483647;
+  max-width: 300px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  animation: dd-status-slide-in 0.3s ease-out;
+}
