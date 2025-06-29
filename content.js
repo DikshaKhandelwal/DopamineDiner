@@ -1284,6 +1284,15 @@ class DopamineDinerTracker {
       taskType: 'breathing_reflection',
       reflection: reflection
     });
+    // Store reflection in chrome.storage.local
+    if (reflection && reflection.length > 2) {
+      chrome.storage.local.get(['reflections'], (result) => {
+        const today = new Date().toISOString().slice(0, 10);
+        const reflections = result.reflections || [];
+        reflections.push({ date: today, text: reflection });
+        chrome.storage.local.set({ reflections });
+      });
+    }
     this.dismissBurnAlert(modal);
   }
 

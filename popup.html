@@ -17,6 +17,7 @@
       <div class="dd-kitchen-level">
         <span class="dd-level-badge">Level <span id="kitchen-level">1</span></span>
       </div>
+      <!-- AI Summary Button will be injected here by JS, but ensure header is relatively positioned -->
     </header>
 
     <!-- Today's Dish -->
@@ -91,8 +92,9 @@
     </section>
 
     <!-- Footer Actions -->
-    <footer class="dd-footer">
-      <button class="dd-reset-btn" id="reset-day">Reset Today</button>
+    <footer class="dd-footer" style="display: flex; justify-content: flex-start; align-items: flex-end; position: relative; min-height: 60px;">
+      <button class="dd-reset-btn" id="reset-day" style="margin-right: auto;">Reset Today</button>
+      <!-- Settings button moved to bottom left -->
       <button class="dd-settings-btn" id="settings">⚙️</button>
     </footer>
   </div>

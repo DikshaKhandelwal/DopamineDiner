@@ -95,17 +95,184 @@ class DopamineDinerPopup {
   async init() {
     await this.loadData();
     this.setupEventListeners();
-    this.updateAll(); // Use a single updateAll for all UI/logic
-    // Set up periodic refresh for all dynamic UI
+    this.updateAll();
     this.startAutoRefresh();
+
+    // Add click handler for today's dish icon
+    const dishIcon = document.querySelector('.dd-dish-icon');
+    if (dishIcon) {
+      dishIcon.addEventListener('click', () => this.showDailyAnalysis());
+    }
+
+    this.addSummaryButton();
   }
 
-  startAutoRefresh() {
-    // Refresh all UI/data every 10 seconds (or as needed)
-    if (this._refreshInterval) clearInterval(this._refreshInterval);
-    this._refreshInterval = setInterval(() => {
-      this.updateAll();
-    }, 10000);
+  // Show daily analysis summary modal
+  showDailyAnalysis() {
+    // Always trigger a fresh analysis request when clicked
+    this.requestDailyAnalysis();
+
+    chrome.storage.local.get(['dailyAnalysis', 'reflections', 'todaysBehavior'], (result) => {
+      // Use the latest stored summary, but also show the raw data used for the summary for debugging
+      const summary = result.dailyAnalysis?.summary
+        ? this.escapeHTML(result.dailyAnalysis.summary)
+        : `<span style="color:#e11d48;font-weight:600;">AI summary error.</span><br><span style="color:#444;">Try again after submitting a reflection and ensure your backend is running.</span>`;
+
+      const today = new Date().toISOString().slice(0, 10);
+      const todaysReflections = (result.reflections || []).filter(r => r.date === today);
+
+      // Show the scrollData used for the summary (for debugging/validation)
+      const scrollData = result.todaysBehavior
+        ? `<pre style="background:#f3f4f6;border-radius:8px;padding:8px 12px;font-size:0.98em;overflow-x:auto;margin-bottom:10px;">${JSON.stringify(result.todaysBehavior, null, 2)}</pre>`
+        : '';
+
+      const modal = document.createElement('div');
+      modal.className = 'dd-modal-overlay active';
+      modal.innerHTML = `
+        <div class="dd-modal dd-daily-analysis-modal">
+          <div class="dd-modal-header">
+            <h3>🍽️ Daily Dish Analysis</h3>
+            <button class="dd-close-btn" id="close-daily-analysis">×</button>
+          </div>
+          <div class="dd-modal-body">
+            <div class="dd-daily-analysis-summary" style="white-space:pre-line;">${summary}</div>
+            <hr style="margin:18px 0;">
+            <div>
+              <strong>Your Reflection${todaysReflections.length > 1 ? 's' : ''}:</strong>
+              <ul style="margin:8px 0 0 0;padding-left:18px;">
+                ${todaysReflections.length
+                  ? todaysReflections.map(r => `<li style="margin-bottom:6px;">${this.escapeHTML(r.text)}</li>`).join('')
+                  : '<li>No reflection submitted today.</li>'}
+              </ul>
+            </div>
+            <hr style="margin:18px 0;">
+            <div>
+              <details style="margin-top:10px;">
+                <summary style="cursor:pointer;font-size:0.98em;color:#10b981;">Show raw data used for AI summary</summary>
+                ${scrollData}
+              </details>
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+      modal.querySelector('#close-daily-analysis').onclick = () => modal.remove();
+    });
+  }
+
+  addSummaryButton() {
+    // Remove if already exists
+    let btn = document.getElementById('dd-summary-btn');
+    if (btn) btn.remove();
+
+    // Create button
+    btn = document.createElement('button');
+    btn.id = 'dd-summary-btn';
+    btn.title = "View your AI-powered daily summary";
+    btn.innerHTML = `<span style="font-size:1.3em;vertical-align:middle;">✨</span>`;
+    btn.style.cssText = `
+      position: absolute;
+      top: 18px;
+      right: 96px;
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg,#a855f7 0%,#ec4899 100%);
+      color: #fff;
+      font-size: 1.25em;
+      font-weight: 700;
+      border: none;
+      border-radius: 50%;
+      box-shadow: 0 2px 12px #10b98122;
+      cursor: pointer;
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+      visibility: visible !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+    `;
+    btn.onmouseenter = () => {
+      btn.style.background = 'linear-gradient(135deg,#ec4899 0%,#a855f7 100%)';
+      btn.style.color = '#222';
+      btn.style.boxShadow = '0 4px 18px #fbbf2444';
+    };
+    btn.onmouseleave = () => {
+      btn.style.background = 'linear-gradient(135deg,#a855f7 0%,#ec4899 100%)';
+      btn.style.color = '#fff';
+      btn.style.boxShadow = '0 2px 12px #10b98122';
+    };
+    btn.onclick = () => this.showDailyAnalysis();
+
+    // Insert into header, near settings
+    const header = document.querySelector('.dd-header');
+    if (header && !document.getElementById('dd-summary-btn')) {
+      if (getComputedStyle(header).position === 'static') {
+        header.style.position = 'relative';
+      }
+      header.appendChild(btn);
+    }
+    if (!document.getElementById('dd-summary-btn')) {
+      document.body.appendChild(btn);
+    }
+    btn.style.visibility = 'visible';
+    btn.style.opacity = '1';
+    btn.style.pointerEvents = 'auto';
+  }
+
+  // Override generateTodaysDish to use AI summary if available
+  async generateTodaysDish() {
+    // Try to use AI summary for dish selection
+    chrome.storage.local.get(['dailyAnalysis'], (result) => {
+      const aiSummary = result.dailyAnalysis?.summary || '';
+      let selectedDish = this.dishes[0];
+
+      // Simple keyword-based mapping from AI summary to dish
+      if (aiSummary) {
+        const summary = aiSummary.toLowerCase();
+        if (summary.includes('scroll') && summary.includes('too much')) {
+          selectedDish = this.dishes[1]; // Greasy Alfredo
+        } else if (summary.includes('short-form') || summary.includes('sugar')) {
+          selectedDish = this.dishes[2]; // Reels Ramen
+        } else if (summary.includes('tab') && summary.includes('switch')) {
+          selectedDish = this.dishes[3]; // Tab Switching Stir-fry
+        } else if (summary.includes('focus') || summary.includes('deep reading') || summary.includes('balanced')) {
+          selectedDish = this.dishes[4]; // Focus Salad
+        } else if (summary.includes('burnout') || summary.includes('unhealthy')) {
+          selectedDish = this.dishes[5]; // Burnout Burger
+        } else if (summary.includes('mindful') || summary.includes('healthy')) {
+          selectedDish = this.dishes[0]; // Mindful Morning Bowl
+        }
+      } else {
+        // Fallback to old logic if no AI summary
+        const behavior = this.data.todaysBehavior;
+        const ingredients = this.calculateIngredients(behavior);
+        const dominantIngredient = Object.entries(ingredients)
+          .sort(([,a], [,b]) => b - a)[0];
+        if (!dominantIngredient || dominantIngredient[1] === 0) {
+          selectedDish = this.dishes[0];
+        } else {
+          const [ingredient, amount] = dominantIngredient;
+          if (ingredient === 'grease' && amount > 50) {
+            selectedDish = this.dishes[1];
+          } else if (ingredient === 'sugar' && amount > 50) {
+            selectedDish = this.dishes[2];
+          } else if (ingredient === 'salt' && amount > 50) {
+            selectedDish = this.dishes[3];
+          } else if (ingredient === 'greens' || ingredient === 'water') {
+            selectedDish = this.dishes[4];
+          } else {
+            selectedDish = this.dishes[5];
+          }
+        }
+      }
+
+      // Update dish display
+      document.querySelector('.dd-dish-icon').textContent = selectedDish.icon;
+      document.getElementById('dish-name').textContent = selectedDish.name;
+      document.getElementById('dish-description').textContent = selectedDish.description;
+    });
   }
 
   async updateAll() {
@@ -156,8 +323,158 @@ class DopamineDinerPopup {
         this.burnAlertTimeout = typeof result.burnAlertTimeout === 'number' ? result.burnAlertTimeout : 60;
         this.customScrollCap = typeof result.customScrollCap === 'number' ? result.customScrollCap : 10000;
         this.customTimeCap = typeof result.customTimeCap === 'number' ? result.customTimeCap : 3600;
+
+        // --- Add: Make scrollData and reflections visible in the frontend ---
+        this.showRawBehaviorAndReflections();
+
         resolve();
       });
+    });
+  }
+
+  // Replace showRawBehaviorAndReflections with a button/modal approach
+  showRawBehaviorAndReflections() {
+    // Remove previous buttons if exist
+    let rawBtn = document.getElementById('dd-rawdata-btn');
+    if (rawBtn) rawBtn.remove();
+    let aiBtn = document.getElementById('dd-summary-btn');
+    if (aiBtn) aiBtn.remove();
+
+    // Create the Raw Data button
+    rawBtn = document.createElement('button');
+    rawBtn.id = 'dd-rawdata-btn';
+    rawBtn.innerHTML = `<span style="font-size:1.2em;vertical-align:middle;">📊</span> Today's Raw Data`;
+    rawBtn.style.cssText = `
+      display: inline-block;
+      margin: 0px 8px 0 0;
+      padding: 10px 22px;
+      background: linear-gradient(90deg,#f3f4f6 0%,#e0e7ef 100%);
+      color: #222;
+      font-size: 1.02em;
+      font-weight: 600;
+      border: none;
+      border-radius: 18px;
+      box-shadow: 0 2px 8px #10b98111;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+      letter-spacing: 0.01em;
+      vertical-align: middle;
+      position: relative;
+      top: -16px;
+      left: -8px;
+    `;
+    rawBtn.onmouseenter = () => {
+      rawBtn.style.background = 'linear-gradient(90deg,#e0e7ef 0%,#f3f4f6 100%)';
+      rawBtn.style.color = '#10b981';
+      rawBtn.style.boxShadow = '0 4px 18px #10b98122';
+    };
+    rawBtn.onmouseleave = () => {
+      rawBtn.style.background = 'linear-gradient(90deg,#f3f4f6 0%,#e0e7ef 100%)';
+      rawBtn.style.color = '#222';
+      rawBtn.style.boxShadow = '0 2px 8px #10b98111';
+    };
+    rawBtn.onclick = () => this.showRawDataModal();
+
+    // Create the AI Summary button (beside Raw Data)
+    aiBtn = document.createElement('button');
+    aiBtn.id = 'dd-summary-btn';
+    aiBtn.title = "View your AI-powered daily summary";
+    aiBtn.innerHTML = `<span style="font-size:1.2em;vertical-align:middle;">✨</span> AI Summary`;
+    aiBtn.style.cssText = `
+      display: inline-block;
+      margin: 0px 0 0 0;
+      padding: 10px 22px;
+      background: linear-gradient(135deg, #a855f7 0%,#ec4899 100%);
+      color: #fff;
+      font-size: 1.02em;
+      font-weight: 600;
+      border: none;
+      border-radius: 18px;
+      box-shadow: 0 2px 8px #10b98122;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+      letter-spacing: 0.01em;
+      vertical-align: middle;
+      position: relative;
+      top: -16px;
+      left: -8px;
+    `;
+    aiBtn.onmouseenter = () => {
+      aiBtn.style.background = 'linear-gradient(135deg,#ec4899 0%,#a855f7 100%)';
+      aiBtn.style.color = '#222';
+      aiBtn.style.boxShadow = '0 4px 18px #fbbf2444';
+    };
+    aiBtn.onmouseleave = () => {
+      aiBtn.style.background = 'linear-gradient(135deg,#a855f7 0%,#ec4899 100%)';
+      aiBtn.style.color = '#fff';
+      aiBtn.style.boxShadow = '0 2px 8px #10b98122';
+    };
+    aiBtn.onclick = () => this.showDailyAnalysis();
+
+    // Insert both buttons after the stats section, side by side
+    const statsSection = document.querySelector('.dd-stats-section');
+    if (statsSection) {
+      // Create a flex container for the buttons if not already present
+      let btnRow = document.getElementById('dd-btn-row');
+      if (!btnRow) {
+        btnRow = document.createElement('div');
+        btnRow.id = 'dd-btn-row';
+        btnRow.style.cssText = `
+          display: flex;
+          flex-direction: row;
+          justify-content: center;
+          align-items: center;
+          gap: 10px;
+        `;
+        statsSection.parentNode.insertBefore(btnRow, statsSection.nextSibling);
+      } else {
+        btnRow.innerHTML = '';
+      }
+      btnRow.appendChild(rawBtn);
+      btnRow.appendChild(aiBtn);
+    }
+  }
+
+  showRawDataModal() {
+    // Remove any existing modal
+    let oldModal = document.getElementById('dd-rawdata-modal');
+    if (oldModal) oldModal.remove();
+
+    // Get today's reflections
+    chrome.storage.local.get(['reflections'], (result) => {
+      const today = new Date().toISOString().slice(0, 10);
+      const todaysReflections = (result.reflections || []).filter(r => r.date === today);
+
+      // Modal
+      const modal = document.createElement('div');
+      modal.id = 'dd-rawdata-modal';
+      modal.className = 'dd-modal-overlay active';
+      modal.innerHTML = `
+        <div class="dd-modal" style="max-width:420px;">
+          <div class="dd-modal-header" style="background:linear-gradient(90deg,#fbbf24 0%,#10b981 100%);color:#fff;">
+            <h3 style="margin:0;font-size:1.25em;">📊 Today's Raw Data</h3>
+            <button class="dd-close-btn" id="close-rawdata-modal" style="color:#fff;">×</button>
+          </div>
+          <div class="dd-modal-body" style="padding:18px 18px 10px 18px;">
+            <div style="font-size:1.08em;">
+              <div style="margin-bottom:8px;"><b>Scroll Distance:</b> <span id="debug-scroll">${this.data.todaysBehavior.scrollDistance}</span> px</div>
+              <div style="margin-bottom:8px;"><b>Time Spent:</b> <span id="debug-time">${this.data.todaysBehavior.timeSpent}</span> sec</div>
+              <div style="margin-bottom:8px;"><b>Tab Switches:</b> <span id="debug-tabs">${this.data.todaysBehavior.tabSwitches}</span></div>
+              <div style="margin-bottom:8px;"><b>Platforms:</b> <span id="debug-platforms">${JSON.stringify(this.data.todaysBehavior.platforms || {})}</span></div>
+              <div style="margin-top:14px;margin-bottom:4px;"><b>Today's Reflection${todaysReflections.length > 1 ? 's' : ''}:</b></div>
+              <ul style="margin:0 0 0 18px;padding:0;">
+                ${todaysReflections.length
+                  ? todaysReflections.map(r => `<li>${this.escapeHTML(r.text)}</li>`).join('')
+                  : '<li>No reflection submitted today.</li>'}
+              </ul>
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+      modal.querySelector('#close-rawdata-modal').onclick = () => modal.remove();
+      // Close modal on overlay click
+      modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
     });
   }
 
@@ -326,6 +643,9 @@ class DopamineDinerPopup {
         // Also clear challenge status in UI
         const status = document.querySelector('.dd-challenge-status');
         if (status) status.textContent = "";
+        // Remove completed class from daily challenge card if present
+        const card = document.querySelector('.dd-daily-challenge-card');
+        if (card) card.classList.remove('completed');
         this.updateAll();
       });
     }
@@ -442,16 +762,41 @@ class DopamineDinerPopup {
   }
 
   calculateIngredients(behavior) {
-    const total = behavior.scrollDistance + behavior.timeSpent + behavior.tabSwitches;
-    if (total === 0) return {};
+    const { scrollDistance = 0, timeSpent = 0, tabSwitches = 0 } = behavior;
 
-    return {
-      grease: Math.min(100, Math.floor((behavior.scrollDistance / 10000) * 100)),
-      sugar: Math.min(100, Math.floor((behavior.timeSpent / 3600) * 100)), // Hours to percentage
-      salt: Math.min(100, Math.floor((behavior.tabSwitches / 50) * 100)),
-      greens: Math.max(0, 100 - Math.floor((behavior.scrollDistance / 5000) * 100)),
-      water: Math.floor(this.data.sessionsCompleted * 10)
+    // Normalize raw values
+    const s = scrollDistance / 10000;   // normalized scroll (max ~1)
+    const t = timeSpent / 3600;         // normalized time (1 hour)
+    const ts = tabSwitches / 50;        // normalized tab switching
+
+    const raw = {
+      grease: s,
+      sugar: t,
+      salt: ts
     };
+
+    const total = s + t + ts;
+
+    if (total === 0) {
+      return {
+        grease: 0,
+        sugar: 0,
+        salt: 0,
+        greens: 100, // perfect score
+        water: 0
+      };
+    }
+
+    // Normalize to 100%
+    const grease = Math.round((raw.grease / total) * 100);
+    const sugar  = Math.round((raw.sugar / total) * 100);
+    const salt   = Math.round((raw.salt / total) * 100);
+
+    // Greens & Water are positive metrics
+    const greens = Math.max(0, 100 - grease); // inversely related to scroll
+    const water = Math.min(100, Math.round((this.data.sessionsCompleted || 0) * 10));
+
+    return { grease, sugar, salt, greens, water };
   }
 
   updateUpgrades() {
@@ -756,6 +1101,99 @@ class DopamineDinerPopup {
     // Break button (triggers break logic)
     const breakBtn = modal.querySelector('.dd-btn-break');
     breakBtn.addEventListener('click', () => this.handleTakeBreak());
+  }
+
+  // Add this method to handle reflection storage and trigger analysis
+  async storeReflection(reflectionText) {
+    if (!reflectionText || reflectionText.length < 3) return;
+    const today = new Date().toISOString().slice(0, 10);
+    chrome.storage.local.get(['reflections'], (result) => {
+      let reflections = result.reflections || [];
+      // Remove duplicate for today (keep only latest for today)
+      reflections = reflections.filter(r => r.date !== today);
+      reflections.push({ date: today, text: reflectionText });
+      chrome.storage.local.set({ reflections }, () => {
+        // Show confirmation to user
+        this.showToast("Reflection saved!");
+        // Trigger analysis after storing
+        this.requestDailyAnalysis();
+      });
+    });
+  }
+
+  // Show a toast notification
+  showToast(msg) {
+    let toast = document.createElement('div');
+    toast.textContent = msg;
+    toast.style.cssText = `
+      position:fixed;bottom:30px;left:50%;transform:translateX(-50%);
+      background:#10b981;color:#fff;padding:12px 28px;border-radius:12px;
+      font-size:1.1rem;font-weight:700;z-index:2147483647;
+      box-shadow:0 4px 16px rgba(0,0,0,0.2);opacity:0.95;
+      animation:fadeInOut 2.2s;
+    `;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2000);
+  }
+
+  // Utility to escape HTML for safe rendering
+  escapeHTML(str) {
+    return (str || '').replace(/[&<>"']/g, function(m) {
+      return ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      })[m];
+    });
+  }
+
+  // Request daily analysis from backend API
+  async requestDailyAnalysis() {
+    chrome.storage.local.get(['todaysBehavior', 'reflections'], async (result) => {
+      const today = new Date().toISOString().slice(0, 10);
+      // Only send the minimal compatible data for the backend
+      const behavior = result.todaysBehavior || {};
+      // Ensure all fields are numbers (not undefined or NaN)
+      const scrollData = {
+        scrollDistance: Number(behavior.scrollDistance) || 0,
+        timeSpent: Number(behavior.timeSpent) || 0,
+        tabSwitches: Number(behavior.tabSwitches) || 0
+      };
+      const reflections = (result.reflections || []).filter(r => r.date === today).map(r => r.text);
+      if (!reflections.length) return;
+
+      // Compose analysis request (only scrollDistance, timeSpent, tabSwitches, and reflections)
+      const payload = {
+        scrollData,
+        reflections
+      };
+
+      try {
+        this.showToast("Generating daily summary...");
+        // Make sure the backend URL is correct and reachable
+        const res = await fetch('http://localhost:3000/api/daily-analysis', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.summary) {
+            chrome.storage.local.set({ dailyAnalysis: data }, () => {
+              this.showToast("AI summary updated!");
+            });
+          } else {
+            this.showToast("AI summary failed.");
+          }
+        } else {
+          this.showToast("AI summary failed.");
+        }
+      } catch (e) {
+        this.showToast("AI summary error.");
+      }
+    });
   }
 }
 

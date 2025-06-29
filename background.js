@@ -57,12 +57,39 @@ function updateBehaviorData(data) {
     'dailyDishes',
     'dopamineIndexHistory',
     'customScrollCap',
-    'customTimeCap'
+    'customTimeCap',
+    'todaysBehavior'
   ], (result) => {
-    const newScrollDistance = (result.totalScrollDistance || 0) + data.scrollDistance;
+    const newScrollDistance = (result.totalScrollDistance || 0) + (data.scrollDistance || 0);
     chrome.storage.local.set({
       totalScrollDistance: newScrollDistance
     });
+
+    // --- Store today's behavior (scrollDistance, timeSpent, tabSwitches) ---
+    const today = new Date().toISOString().slice(0, 10);
+    let todaysBehavior = result.todaysBehavior || {
+      scrollDistance: 0,
+      timeSpent: 0,
+      tabSwitches: 0,
+      platforms: {},
+      sessions: [],
+      peakScrollSpeed: 0,
+      focusedTime: 0,
+      mindfulBreaks: 0
+    };
+
+    // Accumulate tab switches, scroll distance, and time spent for today
+    todaysBehavior.scrollDistance = (todaysBehavior.scrollDistance || 0) + (data.scrollDistance || 0);
+    todaysBehavior.timeSpent = (todaysBehavior.timeSpent || 0) + (data.timeSpent || 0);
+    todaysBehavior.tabSwitches = (todaysBehavior.tabSwitches || 0) + (data.tabSwitches || 0);
+
+    // Optionally update platforms (if available)
+    if (data.platform) {
+      todaysBehavior.platforms = todaysBehavior.platforms || {};
+      todaysBehavior.platforms[data.platform] = (todaysBehavior.platforms[data.platform] || 0) + 1;
+    }
+
+    chrome.storage.local.set({ todaysBehavior });
 
     // Optionally update dopamine index history for heatmap (if provided)
     if (typeof data.dopamineIndex === 'number') {

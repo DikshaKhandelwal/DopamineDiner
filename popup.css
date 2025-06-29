@@ -27,6 +27,7 @@ body {
   margin-bottom: 20px;
   padding-bottom: 16px;
   border-bottom: 2px solid rgba(249, 115, 22, 0.2);
+  position: relative !important;
 }
 
 .dd-logo {
@@ -298,6 +299,7 @@ body {
 }
 
 /* Footer */
+/* Footer */
 .dd-footer {
   display: flex;
   justify-content: space-between;
@@ -335,6 +337,96 @@ body {
 .dd-settings-btn:hover {
   background: rgba(249, 115, 22, 0.1);
 }
+
+/* Modal Styles */
+.dd-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.dd-modal-overlay.active {
+  display: flex;
+}
+
+.dd-modal {
+  background: white;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 480px;
+  max-height: 80%;
+  overflow-y: auto;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.dd-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.dd-modal-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.dd-close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #6b7280;
+  padding: 4px;
+  line-height: 1;
+}
+
+.dd-modal-body {
+  padding: 20px;
+}
+
+.dd-ingredient-guide {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.dd-guide-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 12px;
+}
+
+.dd-guide-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.dd-guide-content h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 4px;
+}
+
+.dd-guide-content p {
+  font-size: 14px;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
 
 /* Modal Styles */
 .dd-modal-overlay {
@@ -721,3 +813,9 @@ body {
   align-items: center;
   justify-content: center;
 }
+
+/* Ensure header is relatively positioned for absolute children */
+.dd-header {
+  position: relative !important;
+}
+
