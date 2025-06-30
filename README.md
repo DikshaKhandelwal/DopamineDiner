@@ -14,7 +14,7 @@
 4. Open a new tab and visit chrome://extensions/
 5. Enable *Developer Mode* (top right).
 6. Click *Load Unpacked* and select the extracted folder.
-7. You're ready! Start browsing Instagram, YouTube, etc., and let the Diner serve you mindful nudges.
+7. You're ready! Start browsing Instagram, YouTube, etc., and let the Diner serve you mindful nudges..
 
 ---
 
