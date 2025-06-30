@@ -19,13 +19,21 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Missing scrollData or reflections' });
     }
 
+    // Convert timeSpent from seconds to minutes for the prompt
+    const scrollDataForPrompt = {
+      ...scrollData,
+      timeSpent: scrollData.timeSpent != null
+        ? `${Math.round(scrollData.timeSpent / 60)} min (${scrollData.timeSpent} sec)`
+        : undefined
+    };
+
     const prompt = `
 You are a mindful digital wellness coach. 
-Given the following user's scroll behavior and their daily reflections, provide a concise, supportive summary in 50 words of their digital habits today, and offer 2-3 gentle suggestions for tomorrow. 
+Given the following user's scroll behavior and their daily reflections, provide a concise, supportive summary of their digital habits today, and offer 2-3 gentle suggestions for tomorrow. 
 Be positive, constructive, and specific.
 
 Scroll Data (JSON): 
-${JSON.stringify(scrollData, null, 2)}
+${JSON.stringify(scrollDataForPrompt, null, 2)}
 
 Reflections:
 ${reflections.map((r, i) => `Reflection ${i + 1}: "${r}"`).join('\n')}

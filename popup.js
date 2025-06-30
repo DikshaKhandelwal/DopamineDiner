@@ -1195,7 +1195,7 @@ calculateIngredients(behavior) {
       try {
         this.showToast("Generating daily summary...");
         // Make sure the backend URL is correct and reachable
-        const res = await fetch('http://localhost:3000/api/daily-analysis', {
+        const res = await fetch('https://dopamine-diner.vercel.app/api/daily-analysis', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)

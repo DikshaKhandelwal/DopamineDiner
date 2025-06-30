@@ -90,10 +90,11 @@ class DopamineDinerTracker {
     // Only trigger if not already showing a modal
     if (this.burnAlertShown) return;
 
-    // Cooldown: Only allow one modal every X minutes (from settings)
+    // --- Force cooldown after first burn alert according to settings ---
     const now = Date.now();
     const cooldown = typeof this.burnCooldownMinutes === 'number' ? this.burnCooldownMinutes : 15;
-    if (now - this.burnAlertLastShown < cooldown * 60 * 1000) return;
+    // If a burn alert has ever been shown, enforce cooldown strictly
+    if (this.burnAlertLastShown > 0 && now - this.burnAlertLastShown < cooldown * 60 * 1000) return;
 
     // Sensitivity: Calculate a "burn score" based on scroll speed and time spent
     const normScroll = Math.min(1, this.scrollData.scrollSpeed / 3500); // 3500 px/s = max
@@ -377,7 +378,13 @@ class DopamineDinerTracker {
     }
 
     // Continue: only enabled after task+reflection
-    continueBtn.addEventListener('click', () => this.handleContinue(modal));
+    continueBtn.addEventListener('click', () => {
+      this.handleContinue(modal);
+      // Redirect to the tab/url the user was working on before the burn alert
+      if (window.location.href) {
+        window.location.href = window.location.href;
+      }
+    });
     breakBtn.addEventListener('click', () => this.handleTakeBreak(modal));
 
     return modal;
