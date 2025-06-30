@@ -546,6 +546,10 @@ class DopamineDinerPopup {
                 </select>
               </div>
               <div class="dd-settings-group">
+                <label for="burn-cooldown-minutes">🔥 Burn Alert Cooldown (minutes)</label>
+                <input type="number" id="burn-cooldown-minutes" name="burnCooldownMinutes" min="1" max="60" step="1" value="${this.burnCooldownMinutes || 15}">
+              </div>
+              <div class="dd-settings-group">
                 <label for="task-preference">🧘 Mindful Task Preference</label>
                 <select id="task-preference" name="taskPreference">
                   <option value="auto">Let Dopamine Diner choose</option>
@@ -576,6 +580,7 @@ class DopamineDinerPopup {
       // Settings form logic
       const form = modal.querySelector('#dd-settings-form');
       const freq = form.querySelector('#burn-alert-frequency');
+      const cooldown = form.querySelector('#burn-cooldown-minutes');
       const task = form.querySelector('#task-preference');
       const timeout = form.querySelector('#burn-alert-timeout');
       const timeoutVal = form.querySelector('#timeout-value');
@@ -584,6 +589,7 @@ class DopamineDinerPopup {
 
       // Set current values
       freq.value = this.burnAlertFrequency;
+      cooldown.value = this.burnCooldownMinutes || 15;
       task.value = this.taskPreference;
       timeout.value = this.burnAlertTimeout;
       timeoutVal.textContent = this.burnAlertTimeout;
@@ -598,12 +604,14 @@ class DopamineDinerPopup {
         e.preventDefault();
         chrome.storage.local.set({
           burnAlertFrequency: freq.value,
+          burnCooldownMinutes: Number(cooldown.value),
           taskPreference: task.value,
           burnAlertTimeout: Number(timeout.value),
           customScrollCap: Number(scrollCap.value),
           customTimeCap: Number(timeCap.value)
         }, () => {
           this.burnAlertFrequency = freq.value;
+          this.burnCooldownMinutes = Number(cooldown.value);
           this.taskPreference = task.value;
           this.burnAlertTimeout = Number(timeout.value);
           this.customScrollCap = Number(scrollCap.value);
@@ -614,6 +622,7 @@ class DopamineDinerPopup {
     } else {
       // Update values if modal already exists
       modal.querySelector('#burn-alert-frequency').value = this.burnAlertFrequency;
+      modal.querySelector('#burn-cooldown-minutes').value = this.burnCooldownMinutes || 15;
       modal.querySelector('#task-preference').value = this.taskPreference;
       modal.querySelector('#burn-alert-timeout').value = this.burnAlertTimeout;
       modal.querySelector('#timeout-value').textContent = this.burnAlertTimeout;
@@ -761,43 +770,56 @@ class DopamineDinerPopup {
     });
   }
 
-  calculateIngredients(behavior) {
-    const { scrollDistance = 0, timeSpent = 0, tabSwitches = 0 } = behavior;
+calculateIngredients(behavior) {
+  const { scrollDistance = 0, timeSpent = 0, tabSwitches = 0 } = behavior;
 
-    // Normalize raw values
-    const s = scrollDistance / 10000;   // normalized scroll (max ~1)
-    const t = timeSpent / 3600;         // normalized time (1 hour)
-    const ts = tabSwitches / 50;        // normalized tab switching
+  const s = scrollDistance / 10000;  // scroll factor
+  const t = timeSpent / 3600;        // time factor
+  const ts = tabSwitches / 50;       // tab switch factor
 
-    const raw = {
-      grease: s,
-      sugar: t,
-      salt: ts
-    };
+  const totalBad = s + t + ts;
 
-    const total = s + t + ts;
+  let grease = 0, sugar = 0, salt = 0, greens = 0, water = 0;
 
-    if (total === 0) {
-      return {
-        grease: 0,
-        sugar: 0,
-        salt: 0,
-        greens: 100, // perfect score
-        water: 0
-      };
-    }
-
-    // Normalize to 100%
-    const grease = Math.round((raw.grease / total) * 100);
-    const sugar  = Math.round((raw.sugar / total) * 100);
-    const salt   = Math.round((raw.salt / total) * 100);
-
-    // Greens & Water are positive metrics
-    const greens = Math.max(0, 100 - grease); // inversely related to scroll
-    const water = Math.min(100, Math.round((this.data.sessionsCompleted || 0) * 10));
-
-    return { grease, sugar, salt, greens, water };
+  if (totalBad > 0) {
+    // Normalize grease/sugar/salt as a proportion of 70% of the total pie
+    grease = Math.round((s / totalBad) * 70);
+    sugar  = Math.round((t / totalBad) * 70);
+    salt   = Math.round((ts / totalBad) * 70);
   }
+
+  // Greens take the remaining % of 100 (positive metric)
+  greens = 100 - (grease + sugar + salt);
+
+  // Water based on sessions, scales within 0–15, and reduces other bads
+  water = Math.min(15, Math.round((this.data.sessionsCompleted || 0) * 3));
+
+  // If adding water, subtract equally from bads (grease/sugar/salt)
+  const totalBeforeWater = grease + sugar + salt + greens;
+  const excess = totalBeforeWater + water - 100;
+
+  if (excess > 0) {
+    // Reduce bads proportionally
+    const reductionRatio = excess / (grease + sugar + salt);
+    grease -= Math.round(grease * reductionRatio);
+    sugar  -= Math.round(sugar * reductionRatio);
+    salt   -= Math.round(salt * reductionRatio);
+  }
+
+  // Final rebalance to ensure total 100
+  const sum = grease + sugar + salt + greens + water;
+  const diff = 100 - sum;
+  greens += diff;
+
+  return {
+    grease: Math.max(0, grease),
+    sugar: Math.max(0, sugar),
+    salt: Math.max(0, salt),
+    greens: Math.max(0, greens),
+    water: Math.max(0, water)
+  };
+}
+
 
   updateUpgrades() {
     const grid = document.getElementById('upgrades-grid');

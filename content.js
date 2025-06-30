@@ -12,7 +12,8 @@ class DopamineDinerTracker {
 
     // --- Burn alert control ---
     this.burnAlertLastShown = 0;
-    this.burnCooldownMinutes = 15; // 15 min cooldown
+    // Default cooldown, will be updated from storage/settings
+    this.burnCooldownMinutes = 15;
     this.burnTriggerThreshold = 0.75; // Sensitivity threshold (0-1, higher = less sensitive)
 
     // Session timer for accurate timeSpent (pause on blur, resume on focus)
@@ -23,7 +24,19 @@ class DopamineDinerTracker {
     this.init();
   }
 
-  init() {
+  async init() {
+    // Load cooldown from chrome.storage.local if set (and keep updated)
+    chrome.storage.local.get(['burnCooldownMinutes'], (result) => {
+      if (typeof result.burnCooldownMinutes === 'number') {
+        this.burnCooldownMinutes = result.burnCooldownMinutes;
+      }
+    });
+    // Listen for changes to cooldown in settings
+    chrome.storage.onChanged.addListener((changes, area) => {
+      if (area === 'local' && changes.burnCooldownMinutes) {
+        this.burnCooldownMinutes = changes.burnCooldownMinutes.newValue;
+      }
+    });
     this.trackScrollBehavior();
     this.trackTimeSpent();
     this.listenForMessages();
@@ -77,9 +90,10 @@ class DopamineDinerTracker {
     // Only trigger if not already showing a modal
     if (this.burnAlertShown) return;
 
-    // Cooldown: Only allow one modal every X minutes
+    // Cooldown: Only allow one modal every X minutes (from settings)
     const now = Date.now();
-    if (now - this.burnAlertLastShown < this.burnCooldownMinutes * 60 * 1000) return;
+    const cooldown = typeof this.burnCooldownMinutes === 'number' ? this.burnCooldownMinutes : 15;
+    if (now - this.burnAlertLastShown < cooldown * 60 * 1000) return;
 
     // Sensitivity: Calculate a "burn score" based on scroll speed and time spent
     const normScroll = Math.min(1, this.scrollData.scrollSpeed / 3500); // 3500 px/s = max
@@ -568,8 +582,8 @@ class DopamineDinerTracker {
   renderScrollPuzzleTask(container, modal, onComplete) {
     container.innerHTML = `
       <div style="text-align:center;">
-        <strong style="color:#92400e;">🧩 Digital Detox Puzzle</strong>
-        <p style="color:#a16207; font-size: 0.9rem; margin: 8px 0;">Arrange the healthy digital habits in order</p>
+        <strong style="color:#78350f;">🧩 Digital Detox Puzzle</strong>
+        <p style="color:#854d0e; font-size: 0.9rem; margin: 8px 0;">Arrange the healthy digital habits in order</p>
         <div id="puzzle-pieces" style="display:flex; flex-direction: column; gap:8px; margin:12px 0;"></div>
         <div id="puzzle-status" style="color:#059669;font-weight:600; margin-top: 12px;"></div>
         <div class="dd-memory-progress" style="width: 100%; height: 4px; background: #fed7aa; border-radius: 2px; margin: 8px 0;">
@@ -769,135 +783,130 @@ class DopamineDinerTracker {
   }
 
   renderFootprintMazeTask(container, modal, onComplete) {
-    container.innerHTML = `
-      <div style="text-align:center;">
-        <strong style="color:#92400e;">👣 Digital Footprint Maze</strong>
-        <p style="color:#a16207; font-size: 0.9rem; margin: 8px 0;">Navigate mindfully to the exit</p>
-        <div id="maze-grid" style="display:grid;grid-template-columns:repeat(5,32px);gap:2px;justify-content:center;margin:10px auto;"></div>
-        <div id="maze-status" style="color:#059669;font-weight:600; margin-top: 8px;"></div>
-        <div style="font-size:0.8rem;color:#a16207; margin-top: 8px;">Use arrow keys to move 🦶 to 🟩</div>
-      </div>
-    `;
-    
     const size = 5;
+    let pos = 0;
+    let moves = 0;
     const grid = Array(size * size).fill('');
     grid[0] = '🦶';
     grid[size * size - 1] = '🟩';
+    const startTime = Date.now();
 
-    // Create a solvable maze with strategic wall placement
-    function createMaze() {
-      // Clear previous walls
-      for (let i = 1; i < size * size - 1; i++) {
-        grid[i] = '';
-      }
-      
-      // Add walls that create a simple but engaging path
-      const walls = [6, 8, 11, 13, 16, 18]; // Strategic positions
-      walls.forEach(pos => {
-        if (pos < size * size - 1) {
-          grid[pos] = '🧱';
-        }
-      });
-      
-      // Ensure path exists using simple pathfinding
+    const walls = [6, 8, 11, 13, 16, 18];
+
+    const createMaze = () => {
+      for (let i = 1; i < size * size - 1; i++) grid[i] = '';
+      walls.forEach(i => { if (i < size * size - 1) grid[i] = '🧱'; });
       if (!isPathClear()) {
-        // Fallback: minimal walls
         for (let i = 1; i < size * size - 1; i++) grid[i] = '';
-        grid[7] = '🧱';
-        grid[12] = '🧱';
-        grid[17] = '🧱';
+        [7, 12, 17].forEach(i => grid[i] = '🧱');
       }
-    }
+    };
 
-    function isPathClear() {
+    const isPathClear = () => {
       const visited = Array(size * size).fill(false);
       const queue = [0];
       visited[0] = true;
-      
+
       while (queue.length) {
         const idx = queue.shift();
         if (idx === size * size - 1) return true;
-        
-        const neighbors = [];
-        if (idx % size > 0) neighbors.push(idx - 1);
-        if (idx % size < size - 1) neighbors.push(idx + 1);
-        if (idx - size >= 0) neighbors.push(idx - size);
-        if (idx + size < size * size) neighbors.push(idx + size);
-        
-        for (const n of neighbors) {
-          if (!visited[n] && grid[n] !== '🧱') {
-            visited[n] = true;
-            queue.push(n);
-          }
+
+        const neighbors = [
+          idx % size > 0 ? idx - 1 : null,
+          idx % size < size - 1 ? idx + 1 : null,
+          idx - size >= 0 ? idx - size : null,
+          idx + size < size * size ? idx + size : null,
+      ].filter(n => n !== null);
+
+      for (const n of neighbors) {
+        if (!visited[n] && grid[n] !== '🧱') {
+          visited[n] = true;
+          queue.push(n);
         }
       }
-      return false;
     }
+    return false;
+  };
 
-    createMaze();
+  const renderGrid = () => {
+    const maze = container.querySelector('#maze-grid');
+    maze.innerHTML = '';
+    grid.forEach((cell, idx) => {
+      const div = document.createElement('div');
+      div.style.cssText = `
+        width: 30px; height: 30px; border: 1px solid #fbbf24;
+        background: ${cell === '🧱' ? '#fcd34d' : '#fff7ed'};
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.2rem; color: ${cell === '🧱' ? '#92400e' : '#374151'};
+        transition: background 0.2s;
+      `;
+      div.textContent = cell || '';
+      maze.appendChild(div);
+    });
+  };
 
-    function render() {
-      const maze = container.querySelector('#maze-grid');
-      maze.innerHTML = '';
-      grid.forEach((cell, idx) => {
-        const div = document.createElement('div');
-        div.style.cssText = `
-          width: 30px; height: 30px; background: #fff7ed; border: 1px solid #fbbf24;
-          display: flex; align-items: center; justify-content: center;
-          font-size: 1.2rem; color: #92400e;
-        `;
-        div.textContent = cell || '';
-        maze.appendChild(div);
-      });
-    }
-    
-    render();
-    let pos = 0;
-    let moves = 0;
-    
-    function move(dir) {
-      let next = pos;
-      if (dir === 'ArrowRight' && (pos % size) < size - 1) next++;
-      if (dir === 'ArrowLeft' && (pos % size) > 0) next--;
-      if (dir === 'ArrowUp' && pos >= size) next -= size;
-      if (dir === 'ArrowDown' && pos < size * (size - 1)) next += size;
-      
-      if (grid[next] === '🧱') return;
-      
-      grid[pos] = '';
-      pos = next;
-      moves++;
-      
-      if (grid[pos] === '🟩') {
-        grid[pos] = '🦶';
-        render();
-        const efficiency = moves <= 8 ? 'efficiently' : 'successfully';
-        container.querySelector('#maze-status').innerHTML = `🎉 Escaped ${efficiency}! (${moves} moves)`;
-        
-        // Celebration effect
-        setTimeout(() => {
-          modal.querySelector('.dd-reflection').style.display = 'block';
-          if (typeof onComplete === 'function') onComplete();
-        }, 1500);
-        
-        document.removeEventListener('keydown', handler);
-        return;
-      }
-      
+  const move = (dir) => {
+    let next = pos;
+    if (dir === 'ArrowRight' && (pos % size) < size - 1) next++;
+    else if (dir === 'ArrowLeft' && (pos % size) > 0) next--;
+    else if (dir === 'ArrowUp' && pos >= size) next -= size;
+    else if (dir === 'ArrowDown' && pos < size * (size - 1)) next += size;
+
+    if (grid[next] === '🧱') return;
+
+    grid[pos] = '';
+    pos = next;
+    moves++;
+
+    if (grid[pos] === '🟩') {
       grid[pos] = '🦶';
-      render();
+      renderGrid();
+      const timeTaken = ((Date.now() - startTime) / 1000).toFixed(1);
+      const status = container.querySelector('#maze-status');
+      status.innerHTML = `🎉 You navigated mindfully in <strong>${moves}</strong> moves over <strong>${timeTaken}s</strong>`;
+      document.removeEventListener('keydown', handler);
+
+      setTimeout(() => {
+        modal.querySelector('.dd-reflection').style.display = 'block';
+        if (typeof onComplete === 'function') onComplete();
+
+        // Add replay button
+        const replay = document.createElement('button');
+        replay.textContent = "🔁 Replay Maze";
+        replay.style.cssText = "margin-top:12px;padding:6px 16px;border-radius:6px;background:#fbbf24;color:#fff;border:none;font-weight:600;cursor:pointer;";
+        replay.onclick = () => this.renderFootprintMazeTask(container, modal, onComplete);
+        container.appendChild(replay);
+      }, 1200);
+    } else {
+      grid[pos] = '🦶';
+      renderGrid();
     }
-    
-    function handler(e) {
-      if (['ArrowRight','ArrowLeft','ArrowUp','ArrowDown'].includes(e.key)) {
-        e.preventDefault();
-        move(e.key);
-      }
+  };
+
+  const handler = (e) => {
+    if (['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+      e.preventDefault();
+      move(e.key);
     }
-    
-    document.addEventListener('keydown', handler);
-    modal.addEventListener('remove', () => document.removeEventListener('keydown', handler));
-  }
+  };
+
+  // Initialize container HTML
+  container.innerHTML = `
+    <div style="text-align:center;">
+      <strong style="color:#92400e;">👣 Digital Footprint Maze</strong>
+      <p style="color:#a16207; font-size: 0.9rem; margin: 8px 0;">Navigate mindfully to the exit</p>
+      <div id="maze-grid" style="display:grid;grid-template-columns:repeat(5,32px);gap:2px;justify-content:center;margin:10px auto;"></div>
+      <div id="maze-status" style="color:#059669;font-weight:600; margin-top: 8px;"></div>
+      <div style="font-size:0.8rem;color:#a16207; margin-top: 8px;">Use arrow keys to move 🦶 to 🟩</div>
+    </div>
+  `;
+
+  createMaze();
+  renderGrid();
+
+  document.addEventListener('keydown', handler);
+  modal.addEventListener('remove', () => document.removeEventListener('keydown', handler));
+}
 
   renderBreathingBubbleTask(container, modal, onComplete) {
     container.innerHTML = `
