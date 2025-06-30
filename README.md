@@ -5,7 +5,7 @@
 *Try It Now:* [Install via Chrome](https://dopamine-diner.vercel.app) (drag-and-drop instructions below)
 
 ---
-<img src="./screenshot.jpg" alt="modal" width="600"/>
+<img src="screenshot.jpg" alt="modal" width="600"/>
 ## 📦 Download & Install the Extension (in Chrome)
 
 1. Go to [https://dopamine-diner.vercel.app](https://dopamine-diner.vercel.app)
