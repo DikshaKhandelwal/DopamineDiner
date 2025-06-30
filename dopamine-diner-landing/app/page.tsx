@@ -235,10 +235,10 @@ export default function LandingPage() {
 
             <div className="mb-6 space-y-2 text-sm text-gray-600">
               <p>
-                Created with ❤️ by <span className="font-semibold text-gray-900">Your Name</span>
+                Created with ❤️ by <span className="font-semibold text-gray-900">Tech Chefs</span>
               </p>
               <p>Built with modern web technologies and AI-powered insights</p>
-              <p>© 2024 Dopamine Diner. Designed for mindful digital experiences.</p>
+              <p>© 2025 Dopamine Diner. Designed for mindful digital experiences.</p>
             </div>
 
             <div className="flex justify-center space-x-6 text-xs text-gray-500">
