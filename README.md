@@ -46,6 +46,17 @@ When thresholds are crossed (e.g., 20 min + high scroll volume), a *Burn Alert* 
 Each interaction is tracked and contributes to the user’s “dish” for the day, generated using AI.
 
 ---
+## 🔥 Burn Alert Testing Parameters
+
+For quick testing of the **Burn Alert** logic, we recommend setting the following thresholds in your settings:
+
+- 🛢️ **Scroll Cap Alert (px):** `10000`  
+  _(Triggers when user scrolls more than 10,000 pixels)_
+
+- ⏱️ **Time Spent Alert (seconds):** `60`  
+  _(Triggers burn modal after 1 minute of browsing)_
+
+These lower values are helpful for **demoing or debugging** Dopamine Diner's interventions without waiting for full browsing sessions.
 
 ## 📈 Impact Measurement
 
